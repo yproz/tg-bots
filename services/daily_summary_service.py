@@ -339,13 +339,13 @@ def format_summary_message(summary_data: SummaryData, today: date) -> str:
     return message
 
 
-def create_inline_keyboard(client_id: str, today: date, marketplace: str) -> Dict[str, Any]:
+def create_inline_keyboard(client_id: str, data_date: date, marketplace: str) -> Dict[str, Any]:
     """
     Создает inline клавиатуру для сообщения.
     
     Args:
         client_id: ID клиента
-        today: Сегодняшняя дата
+        data_date: Дата данных (не обязательно сегодняшняя)
         marketplace: Маркетплейс
         
     Returns:
@@ -357,7 +357,7 @@ def create_inline_keyboard(client_id: str, today: date, marketplace: str) -> Dic
         "inline_keyboard": [[
             {
                 "text": f"📥 Подробный отчет {marketplace_name} (EXCEL)",
-                "callback_data": f"excel_report|{client_id}|{today.strftime('%Y-%m-%d')}|{marketplace}"
+                "callback_data": f"excel_report|{client_id}|{data_date.strftime('%Y-%m-%d')}|{marketplace}"
             }
         ]]
     }
@@ -532,8 +532,9 @@ def process_marketplace_summary(session, client: Any, marketplace: str, today: d
         # Форматируем сообщение
         message = format_summary_message(summary_data, today)
         
-        # Создаем клавиатуру
-        reply_markup = create_inline_keyboard(client.id, today, marketplace)
+        # Создаем клавиатуру с датой данных
+        data_date = summary_data.today_timestamp.date()
+        reply_markup = create_inline_keyboard(client.id, data_date, marketplace)
         
         # Отправляем сообщение
         success = send_telegram_message(client.group_chat_id, message, reply_markup)

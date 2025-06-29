@@ -144,12 +144,12 @@ def check_all_reports_v2():
         return False
 
 @app.task
-def send_daily_summary_v2(client_id: Optional[str] = None):
+def send_daily_summary_v2(client_id: Optional[str] = None, force_send: bool = False):
     """
     Wrapper для рефакторенной версии send_daily_summary_refactored.
     """
     from services.daily_summary_service import send_daily_summary_refactored
-    return send_daily_summary_refactored(client_id)
+    return send_daily_summary_refactored(client_id, force_send)
 
 @app.task
 def send_excel_report_v2(client_id: str, date_str: str, marketplace: Optional[str] = None):
