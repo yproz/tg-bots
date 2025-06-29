@@ -1,0 +1,95 @@
+---
+description: 
+globs: bot/**/*.py, **/*.py
+alwaysApply: false
+---
+---
+description: Best practices and patterns for modern Telegram bot development with python-telegram-bot 20.x (async)
+globs: bot/**/*.py, **/bot/**/*.py, **/*.py
+---
+
+# Telegram Bot Best Practices (python‑telegram‑bot 20.x)
+
+## Project Structure
+- Use **src-layout** with `src/your_project_name/`
+- Keep all bot code under `src/your_project_name/bot/`
+- Place configuration in `config/` (YAML) or via environment variables (recommended: `python-dotenv`)
+- Store requirements in `requirements.txt` or `pyproject.toml` (`poetry` preferred)
+- Keep tests in `tests/` parallel to `src/`
+- Use `assets/` for static files (images, keyboards, locales)
+
+## Code Style
+- Follow **Black** formatting (line length ≤ 88)
+- Use **isort** for import sorting
+- Follow PEP 8 naming:
+  - `snake_case` for functions and variables
+  - `PascalCase` for classes
+  - `UPPER_CASE` for constants
+- Add type hints for **all** parameters and returns
+- Include Google‑style docstrings for public functions and classes
+
+## Async‑First Architecture
+- Use `python-telegram-bot==20.*` **async** API (`Application.builder().token(...).build()`)
+- Organize handlers via **`ConversationHandler` + `CommandHandler` + `CallbackQueryHandler`**
+- Register commands with async callbacks: `async def start(update: Update, context: ContextTypes.DEFAULT_TYPE): ...`
+- Keep business logic pure; separate I/O with the Telegram API from core logic
+- Use context‑based storage (`context.user_data`, `context.chat_data`) for short‑lived state; for persistence use external DB/Redis
+
+## Security
+- Read `BOT_TOKEN`, DB URIs and API keys from environment (`os.getenv`) or a secrets manager
+- Never log or echo sensitive data (tokens, personal info)
+- Validate and sanitize all user inputs; escape MarkdownV2 special characters
+- Rate‑limit heavy commands (e.g., via `aiorate` or custom middleware)
+- Adopt **OWASP TOP‑10** guidelines where applicable (e.g., injection prevention)
+
+## Error Handling
+- Wrap handler bodies with `try/except` catching **specific** exceptions
+- Send concise error messages to users; log full tracebacks at `ERROR` level via `logging`
+- Use custom exception classes for domain errors (e.g., `class VideoTooLargeError(Exception): ...`)
+- Implement global error handler with `application.add_error_handler(error_callback)`
+
+## Testing
+- Use **pytest** with **pytest‑asyncio** for async handlers
+- Mock Telegram objects using `telegram.objects` stubs or `aiogram_tests`-like fixtures
+- Target ≥ 90 % coverage (`pytest-cov`)
+- Include integration tests for webhook/polling startup and critical commands
+
+## Performance
+- Prefer **webhook** deployment for low latency; use **long polling** only for dev
+- For high‑throughput bots employ a task queue (e.g., **Celery** or **aiojobs**) for heavy processing
+- Cache external API results (Redis/TTL) to reduce latency and rate limits
+- Use lazy loading for large ML models; keep them in RAM only when needed
+
+## Deployment & CI/CD
+- Containerize with **Docker**; run as non‑root
+- Multi‑stage builds: first install deps, then copy src
+- Use **GitHub Actions** for lint → test → build → deploy
+- Healthcheck endpoint (`/healthz`) if behind reverse proxy
+- Auto‑restart via **systemd** or **Docker restart: always**
+
+## Logging & Monitoring
+- Configure `logging` with JSON formatter in prod; plain text during dev
+- Send error notifications to admin chat via separate bot token or channel
+- Collect metrics (requests per min, latency) with **Prometheus** + **Grafana**
+
+## Dependencies
+- Pin versions (`python-telegram-bot==20.*`)
+- Separate `dev` and `prod` dependencies (`poetry` groups or `requirements-dev.txt`)
+- Audit regularly with `pip-audit` or `safety`
+- Schedule weekly Dependabot/renovate updates
+
+## Documentation
+- Keep `README.md` with setup, run and deploy instructions
+- Provide command reference table for end users
+- Document environment variables in `.env.example`
+
+## Internationalization (optional)
+- Structure locale files under `locales/<lang>.po`
+- Use `gettext` or builtin PTB i18n helpers (`Context#set_language`) for message translation
+
+## Extras
+- Implement graceful shutdown (`application.stop()`) on SIGINT/SIGTERM
+- Use **async‑pg** or **SQLModel** for DB access in async context
+- Bundle LLM calls via `openai` or `ollama`, wrap in retry policy (`tenacity`)
+- Comply with Telegram rate limits: max 30 msgs/sec per bot, 20 msgs/min per chat
+

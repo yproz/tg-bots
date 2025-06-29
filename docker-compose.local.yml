@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pricebot
+      POSTGRES_USER: pricebot
+      POSTGRES_PASSWORD: pricebot
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+      - ./init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
+      - ./migration_add_orders_results.sql:/docker-entrypoint-initdb.d/migration_add_orders_results.sql
+      - ./migration_add_spp_fields.sql:/docker-entrypoint-initdb.d/migration_add_spp_fields.sql
+      - ./migration_add_parser_fields.sql:/docker-entrypoint-initdb.d/migration_add_parser_fields.sql
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+
+  bot:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    command: ["python", "-m", "bot.main"]
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+
+volumes:
+  postgres_data_local: 
