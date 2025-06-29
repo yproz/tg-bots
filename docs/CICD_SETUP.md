@@ -1,8 +1,8 @@
-# Настройка CI/CD Pipeline
+# Настройка GitHub Actions Pipeline
 
 ## 🚀 Обзор Pipeline
 
-Pipeline состоит из 4 стадий:
+GitHub Actions Workflow состоит из 4 джобов:
 1. **lint** - Проверка качества кода
 2. **test** - Запуск тестов
 3. **build** - Сборка Docker образа
@@ -21,19 +21,19 @@ Pipeline состоит из 4 стадий:
 - **services**: PostgreSQL + Redis для тестов
 - **artifacts**: Coverage report в XML
 
-### 3. Build Stage
+### 3. Build Job
 - **Docker**: Сборка образа приложения
-- **Registry**: Отправка в GitLab Container Registry
-- **Tags**: `$CI_COMMIT_SHA` + `latest`
+- **Registry**: Отправка в GitHub Container Registry (ghcr.io)
+- **Tags**: `$GITHUB_SHA` + `latest`
 
-### 4. Deploy Stage
-- **production**: Автодеплой ветки `main` (manual)
+### 4. Deploy Job
+- **production**: Автодеплой ветки `main` (environment protection)
 
-## 🔧 Настройка GitLab Variables
+## 🔧 Настройка GitHub Secrets
 
-### Обязательные переменные для CI/CD
+### Обязательные секреты для CI/CD
 
-Перейдите в **Settings → CI/CD → Variables** и добавьте:
+Перейдите в **Settings → Secrets and variables → Actions** и добавьте:
 
 #### Деплой переменные (Protected ✓)
 | Переменная | Описание | Пример |
@@ -43,18 +43,18 @@ Pipeline состоит из 4 стадий:
 | `DEPLOY_USER` | Пользователь на сервере | `price-robot-vm` |
 | `DEPLOY_PATH` | Путь к проекту на сервере | `/home/price-robot-vm/pricebot` |
 
-#### Секреты приложения (Protected ✓, Masked ✓)
-См. файл `docs/GITLAB_SECRETS_SETUP.md` для полного списка.
+#### Секреты приложения (Environment secrets)
+См. файл `docs/GITHUB_SECRETS_SETUP.md` для полного списка.
 
 ## 🔀 Правила запуска
 
 ### Lint + Test + Build
 Запускаются при:
-- Merge Request в любую ветку
+- Pull Request в любую ветку
 - Push в ветки `main`, `dev`
 
 ### Deploy
-- **production**: Manual для ветки `main`
+- **production**: Автоматически для ветки `main` (с environment protection)
 
 ## 🐛 Решение проблем
 
@@ -86,11 +86,11 @@ pytest --cov=. --cov-report=html
 ### Разработка
 1. Создайте feature branch от `dev`
 2. Внесите изменения
-3. Создайте MR в `dev`
-4. Pipeline проверит качество кода
+3. Создайте PR в `dev`
+4. GitHub Actions проверит качество кода
 5. После approve → merge в `dev`
 
 ### Релиз
-1. Создайте MR из `dev` в `main`
+1. Создайте PR из `dev` в `main`
 2. После review → merge в `main`
-3. Manual deploy на production
+3. Автоматический deploy на production
