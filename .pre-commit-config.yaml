@@ -1,0 +1,67 @@
+# Pre-commit hooks для SPP Monitoring Bot
+# Запуск: pip install pre-commit && pre-commit install
+
+repos:
+  # Базовые проверки от pre-commit
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Убираем trailing whitespace  
+      - id: trailing-whitespace
+        args: ['--markdown-linebreak-ext=md']
+      
+      # Добавляем пустую строку в конец файла
+      - id: end-of-file-fixer
+      
+      # Проверяем синтаксис YAML файлов
+      - id: check-yaml
+        args: ['--unsafe']  # Для GitLab CI YAML
+      
+      # Проверяем синтаксис JSON файлов  
+      - id: check-json
+      
+      # Предотвращаем коммит больших файлов (>500KB)
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+        
+      # Проверяем merge conflicts
+      - id: check-merge-conflict
+      
+      # Ищем приватные ключи
+      - id: detect-private-key
+      
+      # Проверяем Python синтаксис
+      - id: check-ast
+
+  # Black - форматирование кода
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3.12
+        args: ['--line-length=88']
+
+  # isort - сортировка импортов
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black', '--line-length=88']
+
+  # flake8 - проверка стиля кода
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+
+# Исключения для hook
+exclude: |
+  (?x)^(
+    venv/.*|
+    \.venv/.*|
+    __pycache__/.*|
+    \.git/.*|
+    migrations/.*|
+    \.pytest_cache/.*|
+    \.mypy_cache/.*
+  )$
