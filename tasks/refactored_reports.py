@@ -25,7 +25,6 @@ from services.telegram_notifier import (
 logger = get_task_logger(__name__)
 
 
-@celery_app.task
 def send_excel_report_v2_refactored(client_id: str, date_str: str, marketplace: Optional[str] = None) -> bool:
     """
     Рефакторенная версия генерации и отправки Excel-отчета.
@@ -135,7 +134,7 @@ def generate_report_for_marketplace(client_id: str, date_str: str, marketplace: 
     Returns:
         True если успешно
     """
-    return send_excel_report_v2_refactored.delay(client_id, date_str, marketplace).get()
+    return send_excel_report_v2_refactored(client_id, date_str, marketplace)
 
 
 @celery_app.task
@@ -164,7 +163,7 @@ def generate_all_marketplace_reports(client_id: str, date_str: str) -> dict:
     
     # Генерируем общий отчет
     try:
-        success = send_excel_report_v2_refactored.delay(client_id, date_str, None).get()
+        success = send_excel_report_v2_refactored(client_id, date_str, None)
         results['all'] = success
         logger.info(f"Общий отчет для клиента {client_id}: {'успешно' if success else 'ошибка'}")
     except Exception as e:
