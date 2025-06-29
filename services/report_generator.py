@@ -167,7 +167,7 @@ def create_excel_workbook() -> Tuple[xlsxwriter.Workbook, io.BytesIO]:
     return workbook, output
 
 
-def setup_excel_formats(workbook: xlsxwriter.Workbook) -> Dict[str, xlsxwriter.Format]:
+def setup_excel_formats(workbook: xlsxwriter.Workbook) -> Dict[str, Any]:
     """
     Настраивает форматы для Excel файла.
     
@@ -231,8 +231,8 @@ def calculate_discount_percent(market_price: Optional[float], showcase_price: Op
     return (market_price - showcase_price) / market_price
 
 
-def write_excel_data(worksheet: xlsxwriter.Worksheet, current_results: List[Any], 
-                    previous_data: Dict[str, Dict[str, Any]], formats: Dict[str, xlsxwriter.Format],
+def write_excel_data(worksheet: Any, current_results: List[Any], 
+                    previous_data: Dict[str, Dict[str, Any]], formats: Dict[str, Any],
                     marketplace: Optional[str]) -> ReportStats:
     """
     Записывает данные в Excel worksheet и собирает статистику.
@@ -301,7 +301,7 @@ def write_excel_data(worksheet: xlsxwriter.Worksheet, current_results: List[Any]
     return stats
 
 
-def setup_column_widths(worksheet: xlsxwriter.Worksheet, marketplace: Optional[str]) -> None:
+def setup_column_widths(worksheet: Any, marketplace: Optional[str]) -> None:
     """
     Настраивает ширину столбцов.
     

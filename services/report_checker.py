@@ -317,9 +317,9 @@ def trigger_daily_summary(client_id: str) -> None:
         client_id: ID клиента
     """
     try:
-        from tasks.app_v2 import send_daily_summary_v2
+        from services.daily_summary_service import send_daily_summary_refactored
         logger.info(f"Данные обновлены для клиента {client_id}, запускаем отправку отчета")
-        send_daily_summary_v2.delay(client_id)
+        send_daily_summary_refactored(client_id)
         
     except Exception as e:
         logger.error(f"Ошибка запуска отчета: {e}")

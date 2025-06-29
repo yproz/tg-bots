@@ -401,8 +401,8 @@ async def handle_excel_report_callback(callback: CallbackQuery):
         client_id, date_str = data[1], data[2]
         marketplace = data[3] if len(data) > 3 else None
         
-        from tasks.app_v2 import send_excel_report_v2
-        send_excel_report_v2.delay(client_id, date_str, marketplace)
+        from tasks.refactored_reports import send_excel_report_v2_refactored
+        send_excel_report_v2_refactored.delay(client_id, date_str, marketplace)
         
         marketplace_name = ""
         if marketplace == "ozon":
