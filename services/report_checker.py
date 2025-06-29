@@ -319,7 +319,7 @@ def trigger_daily_summary(client_id: str) -> None:
     try:
         from services.daily_summary_service import send_daily_summary_refactored
         logger.info(f"Данные обновлены для клиента {client_id}, запускаем отправку отчета")
-        send_daily_summary_refactored(client_id)
+        send_daily_summary_refactored(client_id, force_send=True)
         
     except Exception as e:
         logger.error(f"Ошибка запуска отчета: {e}")

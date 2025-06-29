@@ -446,7 +446,7 @@ def generate_summary_for_marketplace(session, client: Any, marketplace: str, tod
         return None
 
 
-def send_daily_summary_refactored(client_id: Optional[str] = None) -> int:
+def send_daily_summary_refactored(client_id: Optional[str] = None, force_send: bool = False) -> int:
     """
     Рефакторенная версия отправки ежедневного отчета.
     
@@ -455,11 +455,12 @@ def send_daily_summary_refactored(client_id: Optional[str] = None) -> int:
     
     Args:
         client_id: ID конкретного клиента или None для всех
+        force_send: Если True, пропускает проверку "уже отправлялся сегодня"
         
     Returns:
         Количество отправленных отчетов
     """
-    logger.info(f"Запуск отправки ежедневного отчета v2 для клиента: {client_id or 'всех'}")
+    logger.info(f"Запуск отправки ежедневного отчета v2 для клиента: {client_id or 'всех'}, force_send: {force_send}")
     
     try:
         from db.session import get_sync_session
@@ -482,7 +483,7 @@ def send_daily_summary_refactored(client_id: Optional[str] = None) -> int:
                 continue
             
             # 4. Проверка уже отправленных отчетов (CC: 1)
-            if is_summary_already_sent(redis_client, client.id, today_str):
+            if not force_send and is_summary_already_sent(redis_client, client.id, today_str):
                 logger.info(f"Отчет для клиента {client.id} уже отправлялся сегодня, пропускаем")
                 continue
             

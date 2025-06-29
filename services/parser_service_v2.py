@@ -318,7 +318,7 @@ class ParserServiceV2:
                         # Отправляем отчет сразу после обновления данных
                         logger.info(f"Данные обновлены для клиента {client_id}, запускаем отправку отчета")
                         from services.daily_summary_service import send_daily_summary_refactored
-                        send_daily_summary_refactored(client_id)
+                        send_daily_summary_refactored(client_id, force_send=True)
                         
             session.commit()
             session.close()
