@@ -199,9 +199,10 @@ async def load_excel(path: str):
 
     Возвращает кортеж: (кол-во вставленных, список ошибок, путь к файлу с ошибками)
     """
-    # Запускаем синхронную версию в отдельном потоке
+    # Запускаем рефакторенную синхронную версию в отдельном потоке
+    from services.excel_processor import sync_load_excel_refactored
     loop = asyncio.get_event_loop()
-    ok, errors, error_rows = await loop.run_in_executor(None, sync_load_excel, path)
+    ok, errors, error_rows = await loop.run_in_executor(None, sync_load_excel_refactored, path)
     
     # Создаем файл с ошибками если есть
     error_file_path = None

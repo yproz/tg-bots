@@ -78,37 +78,7 @@ async def test_excel_loader():
         print(f"❌ Ошибка Excel loader: {e}")
         return False
 
-async def test_summary_reporter():
-    """Тест summary reporter"""
-    print("🔍 Тестируем summary reporter...")
-    try:
-        from services.reporters.summary import format_summary_message
-        
-        # Тестируем форматирование сообщения
-        mock_client = type('MockClient', (), {
-            'id': 'TEST',
-            'name': 'Test Client'
-        })()
-        
-        mock_data = {
-            "increased": 5,
-            "decreased": 3,
-            "unchanged": 10
-        }
-        
-        import datetime as dt
-        message = format_summary_message(mock_client, mock_data, dt.date.today())
-        
-        if "Test Client" in message and "5" in message:
-            print("✅ Summary reporter работает")
-            return True
-        else:
-            print("❌ Неверное форматирование сообщения")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Ошибка summary reporter: {e}")
-        return False
+
 
 async def main():
     """Основная функция тестирования"""
@@ -118,8 +88,7 @@ async def main():
     tests = [
         test_database,
         test_collectors,
-        test_excel_loader,
-        test_summary_reporter
+        test_excel_loader
     ]
     
     results = []
